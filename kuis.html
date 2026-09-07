@@ -1,0 +1,1783 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Kuis Cerdas - SDN Banyuasih</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1565c0, #42a5f5);
+    color: #222;
+}
+
+.container {
+    width: 94%;
+    max-width: 700px;
+    margin: 20px auto;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0,0,0,.25);
+}
+
+.logo {
+    text-align: center;
+    font-size: 55px;
+}
+
+h1 {
+    text-align: center;
+    color: #1565c0;
+    margin: 5px 0;
+}
+
+h2 {
+    color: #1565c0;
+}
+
+.sub {
+    text-align: center;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.info-siswa {
+    background: #e3f2fd;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+}
+
+.info-siswa p {
+    margin: 7px 0;
+}
+
+button {
+    width: 100%;
+    padding: 15px;
+    margin-top: 12px;
+    border: none;
+    border-radius: 12px;
+    background: #1976d2;
+    color: white;
+    font-size: 17px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+button:hover {
+    opacity: .9;
+}
+
+button:disabled {
+    background: #aaa;
+    cursor: not-allowed;
+}
+
+.btn-kelas {
+    margin-top: 10px;
+}
+
+.btn-4 {
+    background: #43a047;
+}
+
+.btn-5 {
+    background: #fb8c00;
+}
+
+.btn-6 {
+    background: #8e24aa;
+}
+
+.btn-kembali {
+    background: #757575;
+}
+
+.btn-danger {
+    background: #e53935;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#pesan {
+    text-align: center;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+#loading {
+    text-align: center;
+    color: #1565c0;
+    padding: 20px;
+}
+
+.progress {
+    height: 12px;
+    background: #ddd;
+    border-radius: 20px;
+    overflow: hidden;
+    margin: 15px 0;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #1976d2;
+    transition: width .3s;
+}
+
+.quiz-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.timer {
+    background: #ffebee;
+    color: #d32f2f;
+    padding: 10px 15px;
+    border-radius: 10px;
+}
+
+.soal-nomor {
+    color: #777;
+    font-size: 14px;
+}
+
+.soal {
+    font-size: 20px;
+    font-weight: bold;
+    line-height: 1.5;
+    margin: 20px 0;
+}
+
+.opsi {
+    width: 100%;
+    text-align: left;
+    background: #f5f5f5;
+    color: #222;
+    border: 2px solid #ddd;
+    margin: 10px 0;
+    font-weight: normal;
+}
+
+.opsi:hover {
+    background: #e3f2fd;
+    border-color: #1976d2;
+}
+
+.opsi.terpilih {
+    background: #bbdefb;
+    border-color: #1976d2;
+}
+
+.hasil-icon {
+    text-align: center;
+    font-size: 70px;
+}
+
+.nilai {
+    text-align: center;
+    font-size: 55px;
+    font-weight: bold;
+    color: #1565c0;
+}
+
+.hasil-box {
+    background: #f5f5f5;
+    border-radius: 15px;
+    padding: 18px;
+    margin-top: 15px;
+}
+
+.hasil-box p {
+    margin: 10px 0;
+}
+
+.leaderboard {
+    margin-top: 15px;
+}
+
+.rank {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px;
+    margin: 8px 0;
+    border-radius: 10px;
+    background: #f5f5f5;
+}
+
+.rank-number {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    background: #1976d2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.rank-info {
+    flex: 1;
+}
+
+.rank-score {
+    font-weight: bold;
+    color: #1565c0;
+}
+
+#statusFirebase {
+    text-align: center;
+    font-size: 13px;
+    margin-top: 15px;
+    color: #777;
+}
+
+@media(max-width:500px) {
+
+    .card {
+        padding: 18px;
+    }
+
+    .soal {
+        font-size: 18px;
+    }
+
+    .quiz-header {
+        font-size: 14px;
+    }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- ==================================================
+     LOADING
+================================================== -->
+
+<div class="card" id="halamanLoading">
+
+    <div class="logo">⏳</div>
+
+    <h1>Memuat Data Siswa</h1>
+
+    <div id="loading">
+        Menghubungkan dengan data absensi...
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     MENU
+================================================== -->
+
+<div class="card hidden" id="halamanMenu">
+
+    <div class="logo">🎓</div>
+
+    <h1>Kuis Cerdas</h1>
+
+    <div class="sub">
+        SDN Banyuasih
+    </div>
+
+    <div class="info-siswa">
+
+        <p>
+            <b>Nama:</b>
+            <span id="namaSiswa"></span>
+        </p>
+
+        <p>
+            <b>Kelas:</b>
+            <span id="kelasSiswa"></span>
+        </p>
+
+        <p>
+            <b>Status:</b>
+            <span style="color:#2e7d32">
+                ✅ Sudah Absen
+            </span>
+        </p>
+
+    </div>
+
+    <h2>Pilih Kelas</h2>
+
+    <button class="btn-kelas btn-4"
+            onclick="mulaiKuis(4)">
+        📘 KUIS KELAS 4
+    </button>
+
+    <button class="btn-kelas btn-5"
+            onclick="mulaiKuis(5)">
+        📗 KUIS KELAS 5
+    </button>
+
+    <button class="btn-kelas btn-6"
+            onclick="mulaiKuis(6)">
+        📕 KUIS KELAS 6
+    </button>
+
+    <button onclick="lihatLeaderboard()">
+        🏆 LEADERBOARD
+    </button>
+
+    <button class="btn-kembali"
+            onclick="kembaliBelajar()">
+        📚 KEMBALI KE BELAJAR
+    </button>
+
+    <div id="statusFirebase">
+        Firebase terhubung
+    </div>
+
+</div>
+
+
+<!-- ==================================================
+     QUIZ
+================================================== -->
+
+<div class="card hidden" id="halamanKuis">
+
+    <div class="quiz-header">
+
+        <span id="labelKelas">
+            Kelas 4
+        </span>
+
+        <span class="timer">
+            ⏱️ <span id="timer">30</span>
+        </span>
+
+    </div>
+
+    <div class="progress">
+        <div class="progress-bar"
+             id="progressBar"></div>
+    </div>
+
+    <div class="soal-nomor"
+         id="nomorSoal">
+        Soal 1 dari 10
+    </div>
+
+    <div class="soal"
+         id="teksSoal">
+        Memuat soal...
+    </div>
+
+    <div id="containerOpsi"></div>
+
+    <button id="btnBerikutnya"
+            onclick="jawabDanLanjut()"
+            disabled>
+        JAWAB & LANJUT
+    </button>
+
+</div>
+
+
+<!-- ==================================================
+     HASIL
+================================================== -->
+
+<div class="card hidden" id="halamanHasil">
+
+    <div class="hasil-icon">
+        🏆
+    </div>
+
+    <h1>Hasil Kuis</h1>
+
+    <div class="sub">
+        <span id="hasilNama"></span>
+    </div>
+
+    <div class="nilai"
+         id="hasilNilai">
+        0
+    </div>
+
+    <div style="text-align:center">
+        Nilai
+    </div>
+
+    <div class="hasil-box">
+
+        <p>
+            📝 Total soal:
+            <b id="hasilTotal">0</b>
+        </p>
+
+        <p>
+            ✅ Jawaban benar:
+            <b id="hasilBenar">0</b>
+        </p>
+
+        <p>
+            ❌ Jawaban salah:
+            <b id="hasilSalah">0</b>
+        </p>
+
+        <p>
+            📚 Kelas:
+            <b id="hasilKelas">-</b>
+        </p>
+
+        <p>
+            📊 Mata pelajaran:
+            <b>Matematika, Bahasa Indonesia, IPAS</b>
+        </p>
+
+    </div>
+
+    <button onclick="lihatLeaderboard()">
+        🏆 LIHAT LEADERBOARD
+    </button>
+
+    <button onclick="kembaliMenu()">
+        🔄 KEMBALI KE MENU
+    </button>
+
+</div>
+
+
+<!-- ==================================================
+     LEADERBOARD
+================================================== -->
+
+<div class="card hidden" id="halamanLeaderboard">
+
+    <div class="logo">🏆</div>
+
+    <h1>Leaderboard</h1>
+
+    <div class="sub">
+        Peringkat siswa berdasarkan nilai kuis
+    </div>
+
+    <div id="loadingLeaderboard">
+        ⏳ Memuat leaderboard...
+    </div>
+
+    <div class="leaderboard"
+         id="daftarLeaderboard">
+    </div>
+
+    <button class="btn-kembali"
+            onclick="kembaliMenu()">
+        ← KEMBALI
+    </button>
+
+</div>
+
+
+<!-- ==================================================
+     PESAN
+================================================== -->
+
+<div class="card hidden" id="halamanPesan">
+
+    <div class="logo">⚠️</div>
+
+    <h1>Belum Login</h1>
+
+    <p style="text-align:center"
+       id="pesanLogin">
+        Silakan melakukan absensi terlebih dahulu.
+    </p>
+
+    <button onclick="kembaliBelajar()">
+        📚 KEMBALI KE ABSENSI
+    </button>
+
+</div>
+
+</div>
+
+
+<!-- ==================================================
+     FIREBASE
+================================================== -->
+
+<script type="module">
+
+import {
+    initializeApp
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+    getDatabase,
+    ref,
+    push,
+    get
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+
+/* ==================================================
+   FIREBASE CONFIG
+================================================== */
+
+const firebaseConfig = {
+
+    apiKey:
+    "AIzaSyAxkzAATrhLg3rPPmmubY8QUw4bqtgovVk",
+
+    authDomain:
+    "sdnbanyuasih-68f01.firebaseapp.com",
+
+    databaseURL:
+    "https://sdnbanyuasih-68f01-default-rtdb.asia-southeast1.firebasedatabase.app",
+
+    projectId:
+    "sdnbanyuasih-68f01",
+
+    storageBucket:
+    "sdnbanyuasih-68f01.firebasestorage.app",
+
+    messagingSenderId:
+    "742260762603",
+
+    appId:
+    "1:742260762603:web:3e15a0b090bb6638fc9bae"
+
+};
+
+
+/* ==================================================
+   FIREBASE INIT
+================================================== */
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+
+/* ==================================================
+   DATA SISWA DARI ABSENSI
+================================================== */
+
+let dataSiswa = null;
+
+
+/* ==================================================
+   BANK SOAL
+================================================== */
+
+const bankSoal = {
+
+
+4: [
+
+/* MATEMATIKA */
+
+{
+mapel:"Matematika",
+soal:"Hasil dari 25 + 37 adalah ...",
+opsi:["52","62","72","82"],
+jawaban:1
+},
+
+{
+mapel:"Matematika",
+soal:"Hasil dari 8 × 7 adalah ...",
+opsi:["54","56","64","72"],
+jawaban:1
+},
+
+{
+mapel:"Matematika",
+soal:"Pecahan yang senilai dengan 1/2 adalah ...",
+opsi:["1/3","2/4","3/5","4/6"],
+jawaban:1
+},
+
+/* BAHASA INDONESIA */
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Lawan kata dari 'tinggi' adalah ...",
+opsi:["besar","panjang","rendah","lebar"],
+jawaban:2
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Kalimat yang digunakan untuk menanyakan sesuatu disebut kalimat ...",
+opsi:["perintah","tanya","berita","seruan"],
+jawaban:1
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Kata yang menunjukkan nama orang, tempat, atau benda disebut ...",
+opsi:["kata kerja","kata sifat","kata benda","kata tanya"],
+jawaban:2
+},
+
+/* IPAS */
+
+{
+mapel:"IPAS",
+soal:"Bagian tumbuhan yang berfungsi menyerap air dari tanah adalah ...",
+opsi:["daun","batang","akar","bunga"],
+jawaban:2
+},
+
+{
+mapel:"IPAS",
+soal:"Sumber energi utama bagi kehidupan di Bumi adalah ...",
+opsi:["Bulan","Matahari","angin","air"],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Hewan yang berkembang biak dengan bertelur disebut ...",
+opsi:["vivipar","ovipar","herbivor","karnivor"],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Air yang dipanaskan terus-menerus akan berubah menjadi ...",
+opsi:["es","uap air","tanah","embun"],
+jawaban:1
+}
+
+],
+
+
+5: [
+
+/* MATEMATIKA */
+
+{
+mapel:"Matematika",
+soal:"Hasil dari 125 × 4 adalah ...",
+opsi:["400","450","500","550"],
+jawaban:2
+},
+
+{
+mapel:"Matematika",
+soal:"Hasil dari 3/4 + 1/4 adalah ...",
+opsi:["1/2","3/4","1","2"],
+jawaban:2
+},
+
+{
+mapel:"Matematika",
+soal:"Keliling persegi dengan sisi 8 cm adalah ...",
+opsi:["16 cm","24 cm","32 cm","64 cm"],
+jawaban:2
+},
+
+/* BAHASA INDONESIA */
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Gagasan utama dalam sebuah paragraf disebut ...",
+opsi:["kalimat penjelas","ide pokok","judul","kata kunci"],
+jawaban:1
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Kata 'rajin' memiliki lawan kata ...",
+opsi:["tekun","malas","pandai","cepat"],
+jawaban:1
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Teks yang berisi langkah-langkah melakukan sesuatu disebut teks ...",
+opsi:["narasi","deskripsi","prosedur","puisi"],
+jawaban:2
+},
+
+/* IPAS */
+
+{
+mapel:"IPAS",
+soal:"Organ pernapasan utama manusia adalah ...",
+opsi:["jantung","paru-paru","lambung","ginjal"],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Gaya yang menyebabkan benda jatuh ke bawah adalah gaya ...",
+opsi:["gesek","magnet","gravitasi","pegas"],
+jawaban:2
+},
+
+{
+mapel:"IPAS",
+soal:"Perubahan wujud dari cair menjadi gas disebut ...",
+opsi:["membeku","menguap","mencair","mengembun"],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Contoh sumber energi yang dapat diperbarui adalah ...",
+opsi:["batu bara","minyak bumi","matahari","gas alam"],
+jawaban:2
+}
+
+],
+
+
+6: [
+
+/* MATEMATIKA */
+
+{
+mapel:"Matematika",
+soal:"Hasil dari 3/4 × 8 adalah ...",
+opsi:["4","5","6","7"],
+jawaban:2
+},
+
+{
+mapel:"Matematika",
+soal:"Luas persegi panjang dengan panjang 12 cm dan lebar 5 cm adalah ...",
+opsi:["17 cm²","34 cm²","60 cm²","120 cm²"],
+jawaban:2
+},
+
+{
+mapel:"Matematika",
+soal:"FPB dari 24 dan 36 adalah ...",
+opsi:["6","8","12","18"],
+jawaban:2
+},
+
+/* BAHASA INDONESIA */
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Informasi penting dalam sebuah teks dapat ditemukan dengan cara ...",
+opsi:[
+"membaca judul saja",
+"membaca seluruh teks dengan teliti",
+"melihat gambar saja",
+"membaca kalimat terakhir saja"
+],
+jawaban:1
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Kalimat yang berisi ajakan biasanya menggunakan kata ...",
+opsi:["jangan","mari","karena","tetapi"],
+jawaban:1
+},
+
+{
+mapel:"Bahasa Indonesia",
+soal:"Ringkasan adalah ...",
+opsi:[
+"cerita yang dibuat lebih panjang",
+"inti dari sebuah bacaan",
+"judul sebuah bacaan",
+"daftar kata sulit"
+],
+jawaban:1
+},
+
+/* IPAS */
+
+{
+mapel:"IPAS",
+soal:"Planet tempat manusia hidup adalah ...",
+opsi:["Mars","Venus","Bumi","Jupiter"],
+jawaban:2
+},
+
+{
+mapel:"IPAS",
+soal:"Proses tumbuhan membuat makanan sendiri disebut ...",
+opsi:[
+"respirasi",
+"fotosintesis",
+"evaporasi",
+"adaptasi"
+],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Contoh perubahan energi listrik menjadi energi panas terdapat pada ...",
+opsi:[
+"kipas angin",
+"setrika",
+"radio",
+"sepeda"
+],
+jawaban:1
+},
+
+{
+mapel:"IPAS",
+soal:"Salah satu cara menjaga lingkungan adalah ...",
+opsi:[
+"membuang sampah ke sungai",
+"menebang semua pohon",
+"membuang sampah pada tempatnya",
+"membakar semua sampah"
+],
+jawaban:2
+}
+
+]
+
+};
+
+
+/* ==================================================
+   VARIABEL KUIS
+================================================== */
+
+let kelasAktif = null;
+
+let soalKuis = [];
+
+let nomorSekarang = 0;
+
+let jawabanDipilih = null;
+
+let benar = 0;
+
+let salah = 0;
+
+let timer = null;
+
+let waktuTersisa = 30;
+
+
+/* ==================================================
+   CEK DATA SISWA
+================================================== */
+
+function cekDataSiswa() {
+
+    const data =
+        localStorage.getItem("dataSiswa");
+
+
+    if (!data) {
+
+        tampilkan("halamanPesan");
+
+        return false;
+
+    }
+
+
+    try {
+
+        dataSiswa =
+            JSON.parse(data);
+
+
+        if (
+            !dataSiswa.nama ||
+            !dataSiswa.kelas
+        ) {
+
+            throw new Error(
+                "Data siswa tidak lengkap"
+            );
+
+        }
+
+
+        document.getElementById(
+            "namaSiswa"
+        ).innerText =
+            dataSiswa.nama;
+
+
+        document.getElementById(
+            "kelasSiswa"
+        ).innerText =
+            "Kelas " + dataSiswa.kelas;
+
+
+        return true;
+
+
+    } catch(error) {
+
+        console.error(error);
+
+        localStorage.removeItem(
+            "dataSiswa"
+        );
+
+        tampilkan("halamanPesan");
+
+        return false;
+
+    }
+
+}
+
+
+/* ==================================================
+   TAMPILKAN HALAMAN
+================================================== */
+
+function tampilkan(id) {
+
+    document.querySelectorAll(".card")
+        .forEach(el => {
+
+            el.classList.add("hidden");
+
+        });
+
+
+    document.getElementById(id)
+        .classList.remove("hidden");
+
+}
+
+
+/* ==================================================
+   ACAK ARRAY
+================================================== */
+
+function acakArray(array) {
+
+    return [...array]
+        .sort(
+            () => Math.random() - 0.5
+        );
+
+}
+
+
+/* ==================================================
+   MULAI KUIS
+================================================== */
+
+window.mulaiKuis = function(kelas) {
+
+    kelasAktif = kelas;
+
+
+    /*
+     * Siswa tetap boleh membuka
+     * kuis sesuai kelas yang dipilih.
+     *
+     * Tetapi kelas siswa ditampilkan.
+     */
+
+    soalKuis =
+        acakArray(
+            bankSoal[kelas]
+        );
+
+
+    /*
+     * Maksimal 10 soal
+     */
+
+    soalKuis =
+        soalKuis.slice(0, 10);
+
+
+    nomorSekarang = 0;
+
+    benar = 0;
+
+    salah = 0;
+
+
+    tampilkan("halamanKuis");
+
+    tampilkanSoal();
+
+};
+
+
+/* ==================================================
+   TAMPILKAN SOAL
+================================================== */
+
+function tampilkanSoal() {
+
+    clearInterval(timer);
+
+
+    jawabanDipilih = null;
+
+
+    waktuTersisa = 30;
+
+    document.getElementById(
+        "timer"
+    ).innerText = waktuTersisa;
+
+
+    const soal =
+        soalKuis[
+            nomorSekarang
+        ];
+
+
+    document.getElementById(
+        "labelKelas"
+    ).innerText =
+        "Kelas " +
+        kelasAktif +
+        " • " +
+        soal.mapel;
+
+
+    document.getElementById(
+        "nomorSoal"
+    ).innerText =
+        "Soal " +
+        (nomorSekarang + 1) +
+        " dari " +
+        soalKuis.length;
+
+
+    document.getElementById(
+        "teksSoal"
+    ).innerText =
+        soal.soal;
+
+
+    const progress =
+        (
+            nomorSekarang /
+            soalKuis.length
+        ) * 100;
+
+
+    document.getElementById(
+        "progressBar"
+    ).style.width =
+        progress + "%";
+
+
+    const container =
+        document.getElementById(
+            "containerOpsi"
+        );
+
+
+    container.innerHTML = "";
+
+
+    /*
+     * Acak pilihan jawaban,
+     * tetapi jawaban benar tetap diketahui.
+     */
+
+    const opsiAcak =
+        soal.opsi.map(
+            (teks, index) => ({
+                teks: teks,
+                index: index
+            })
+        );
+
+
+    opsiAcak.sort(
+        () => Math.random() - 0.5
+    );
+
+
+    opsiAcak.forEach(
+        item => {
+
+            const tombol =
+                document.createElement(
+                    "button"
+                );
+
+
+            tombol.className =
+                "opsi";
+
+
+            tombol.innerText =
+                item.teks;
+
+
+            tombol.dataset.index =
+                item.index;
+
+
+            tombol.onclick =
+                function() {
+
+                    pilihJawaban(
+                        item.index,
+                        tombol
+                    );
+
+                };
+
+
+            container.appendChild(
+                tombol
+            );
+
+        }
+    );
+
+
+    document.getElementById(
+        "btnBerikutnya"
+    ).disabled = true;
+
+
+    mulaiTimer();
+
+}
+
+
+/* ==================================================
+   PILIH JAWABAN
+================================================== */
+
+function pilihJawaban(
+    index,
+    tombol
+) {
+
+    jawabanDipilih = index;
+
+
+    document.querySelectorAll(
+        ".opsi"
+    ).forEach(
+        el => {
+
+            el.classList.remove(
+                "terpilih"
+            );
+
+        }
+    );
+
+
+    tombol.classList.add(
+        "terpilih"
+    );
+
+
+    document.getElementById(
+        "btnBerikutnya"
+    ).disabled = false;
+
+}
+
+
+/* ==================================================
+   TIMER
+================================================== */
+
+function mulaiTimer() {
+
+    timer =
+        setInterval(
+            function() {
+
+                waktuTersisa--;
+
+
+                document.getElementById(
+                    "timer"
+                ).innerText =
+                    waktuTersisa;
+
+
+                if (
+                    waktuTersisa <= 0
+                ) {
+
+                    clearInterval(timer);
+
+                    /*
+                     * Waktu habis dianggap
+                     * jawaban salah.
+                     */
+
+                    if (
+                        jawabanDipilih === null
+                    ) {
+
+                        salah++;
+
+                    } else {
+
+                        const soal =
+                            soalKuis[
+                                nomorSekarang
+                            ];
+
+
+                        if (
+                            jawabanDipilih
+                            ===
+                            soal.jawaban
+                        ) {
+
+                            benar++;
+
+                        } else {
+
+                            salah++;
+
+                        }
+
+                    }
+
+
+                    lanjutSoal();
+
+                }
+
+            },
+            1000
+        );
+
+}
+
+
+/* ==================================================
+   JAWAB DAN LANJUT
+================================================== */
+
+window.jawabDanLanjut =
+function() {
+
+    clearInterval(timer);
+
+
+    const soal =
+        soalKuis[
+            nomorSekarang
+        ];
+
+
+    if (
+        jawabanDipilih
+        ===
+        soal.jawaban
+    ) {
+
+        benar++;
+
+    } else {
+
+        salah++;
+
+    }
+
+
+    lanjutSoal();
+
+};
+
+
+/* ==================================================
+   LANJUT SOAL
+================================================== */
+
+function lanjutSoal() {
+
+    nomorSekarang++;
+
+
+    if (
+        nomorSekarang
+        >=
+        soalKuis.length
+    ) {
+
+        selesaiKuis();
+
+    } else {
+
+        tampilkanSoal();
+
+    }
+
+}
+
+
+/* ==================================================
+   SELESAI KUIS
+================================================== */
+
+async function selesaiKuis() {
+
+    clearInterval(timer);
+
+
+    const total =
+        soalKuis.length;
+
+
+    const nilai =
+        Math.round(
+            (benar / total) * 100
+        );
+
+
+    document.getElementById(
+        "hasilNama"
+    ).innerText =
+        dataSiswa.nama;
+
+
+    document.getElementById(
+        "hasilNilai"
+    ).innerText =
+        nilai;
+
+
+    document.getElementById(
+        "hasilTotal"
+    ).innerText =
+        total;
+
+
+    document.getElementById(
+        "hasilBenar"
+    ).innerText =
+        benar;
+
+
+    document.getElementById(
+        "hasilSalah"
+    ).innerText =
+        salah;
+
+
+    document.getElementById(
+        "hasilKelas"
+    ).innerText =
+        "Kelas " + kelasAktif;
+
+
+    tampilkan(
+        "halamanHasil"
+    );
+
+
+    /*
+     * SIMPAN KE FIREBASE
+     */
+
+    await simpanHasil(
+        nilai,
+        total
+    );
+
+}
+
+
+/* ==================================================
+   SIMPAN HASIL KUIS
+================================================== */
+
+async function simpanHasil(
+    nilai,
+    total
+) {
+
+    try {
+
+        const sekarang =
+            new Date();
+
+
+        const tanggal =
+            sekarang.toLocaleDateString(
+                "id-ID",
+                {
+                    day:"2-digit",
+                    month:"2-digit",
+                    year:"numeric"
+                }
+            );
+
+
+        const waktu =
+            sekarang.toLocaleTimeString(
+                "id-ID",
+                {
+                    hour:"2-digit",
+                    minute:"2-digit",
+                    second:"2-digit"
+                }
+            );
+
+
+        /*
+         * Struktur Firebase:
+         *
+         * kuis/
+         *   hasil/
+         *      autoID/
+         */
+
+        const hasilRef =
+            ref(
+                db,
+                "kuis/hasil"
+            );
+
+
+        await push(
+            hasilRef,
+            {
+
+                nama:
+                    dataSiswa.nama,
+
+                kelas:
+                    String(kelasAktif),
+
+                kelasAbsensi:
+                    String(
+                        dataSiswa.kelas
+                    ),
+
+                skor:
+                    nilai,
+
+                benar:
+                    benar,
+
+                salah:
+                    salah,
+
+                totalSoal:
+                    total,
+
+                tanggal:
+                    tanggal,
+
+                waktu:
+                    waktu,
+
+                timestamp:
+                    Date.now()
+
+            }
+        );
+
+
+        console.log(
+            "Hasil kuis berhasil disimpan."
+        );
+
+
+    } catch(error) {
+
+        console.error(
+            "Gagal menyimpan hasil:",
+            error
+        );
+
+        alert(
+            "Nilai sudah selesai, tetapi hasil belum berhasil disimpan ke Firebase. Periksa aturan Database."
+        );
+
+    }
+
+}
+
+
+/* ==================================================
+   LEADERBOARD
+================================================== */
+
+window.lihatLeaderboard =
+async function() {
+
+    tampilkan(
+        "halamanLeaderboard"
+    );
+
+
+    const loading =
+        document.getElementById(
+            "loadingLeaderboard"
+        );
+
+
+    const daftar =
+        document.getElementById(
+            "daftarLeaderboard"
+        );
+
+
+    loading.style.display =
+        "block";
+
+
+    daftar.innerHTML = "";
+
+
+    try {
+
+        const hasilRef =
+            ref(
+                db,
+                "kuis/hasil"
+            );
+
+
+        const snapshot =
+            await get(
+                hasilRef
+            );
+
+
+        loading.style.display =
+            "none";
+
+
+        if (
+            !snapshot.exists()
+        ) {
+
+            daftar.innerHTML =
+                `
+                <p style="text-align:center">
+                    Belum ada hasil kuis.
+                </p>
+                `;
+
+            return;
+
+        }
+
+
+        const data =
+            snapshot.val();
+
+
+        let daftarData =
+            [];
+
+
+        for (
+            const id in data
+        ) {
+
+            daftarData.push({
+                id: id,
+                ...data[id]
+            });
+
+        }
+
+
+        /*
+         * Nilai tertinggi di atas.
+         */
+
+        daftarData.sort(
+            (a,b) =>
+                Number(b.skor || 0)
+                -
+                Number(a.skor || 0)
+        );
+
+
+        /*
+         * Ambil 20 besar.
+         */
+
+        daftarData =
+            daftarData.slice(
+                0,
+                20
+            );
+
+
+        daftarData.forEach(
+            (siswa, index) => {
+
+                const div =
+                    document.createElement(
+                        "div"
+                    );
+
+
+                div.className =
+                    "rank";
+
+
+                div.innerHTML =
+                    `
+                    <div class="rank-number">
+                        ${index + 1}
+                    </div>
+
+                    <div class="rank-info">
+                        <b>${escapeHTML(siswa.nama || "-")}</b>
+                        <br>
+                        <small>
+                            Kelas ${escapeHTML(siswa.kelas || "-")}
+                        </small>
+                    </div>
+
+                    <div class="rank-score">
+                        ${Number(siswa.skor || 0)}
+                    </div>
+                    `;
+
+
+                daftar.appendChild(
+                    div
+                );
+
+            }
+        );
+
+
+    } catch(error) {
+
+        console.error(error);
+
+
+        loading.style.display =
+            "none";
+
+
+        daftar.innerHTML =
+            `
+            <p style="text-align:center;color:red">
+                Gagal mengambil leaderboard dari Firebase.
+            </p>
+            `;
+
+    }
+
+};
+
+
+/* ==================================================
+   ESCAPE HTML
+================================================== */
+
+function escapeHTML(text) {
+
+    return String(text)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+/* ==================================================
+   KEMBALI MENU
+================================================== */
+
+window.kembaliMenu =
+function() {
+
+    tampilkan(
+        "halamanMenu"
+    );
+
+};
+
+
+/* ==================================================
+   KEMBALI KE BELAJAR
+================================================== */
+
+window.kembaliBelajar =
+function() {
+
+    window.location.href =
+        "https://sdnbanyuasih2.github.io/Sdnbanyuasih-kelas-jauh/";
+
+};
+
+
+/* ==================================================
+   MULAI
+================================================== */
+
+if (
+    cekDataSiswa()
+) {
+
+    tampilkan(
+        "halamanMenu"
+    );
+
+} else {
+
+    tampilkan(
+        "halamanPesan"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
